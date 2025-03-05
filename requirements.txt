@@ -8,3 +8,5 @@ faiss-cpu
 tiktoken
 langchain-openai
 langchain-community
+faker
+pypdf
