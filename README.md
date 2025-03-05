@@ -72,13 +72,13 @@ IMMO_RAG
 
 ## Prérequis et Installation
 
-1. **Python 3.7+**  
-   Assurez-vous d’avoir Python 3.7 ou une version ultérieure installée.
+1. **Python 3.11+**  
+   Assurez-vous d’avoir Python 3.11 ou une version ultérieure installée.
 
 2. **Cloner le dépôt**  
 
    ```bash
-   git clone <URL_DU_DEPOT>
+   git clone git@github.com:GrandEmpereur/ImmoRAG.git
    cd IMMO_RAG
    ```
 
@@ -102,11 +102,7 @@ IMMO_RAG
 ## Configuration
 
 1. **Variables d’environnement**  
-   Créez un fichier `.env` (ou modifiez le `.env.local`) à la racine du projet. Ajoutez-y la variable `OPENAI_API_KEY` :
-
-   ```
-   OPENAI_API_KEY=<votre_cle_openai>
-   ```
+   Copiez le fichier `.env.example` en `.env` et remplacez la valeur de la variable `OPENAI_API_KEY` par votre clé API OpenAI.
 
 2. **Paramètres optionnels**  
    - Vous pouvez définir d’autres variables d’environnement si nécessaire (par exemple, des chemins vers des répertoires spécifiques, des identifiants de base de données, etc.).
