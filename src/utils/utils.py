@@ -30,22 +30,28 @@ def load_csv_into_vectorstore(csv_path):
 
 def ask_question(vectorstore, question):
     """
-    Récupère les documents pertinents depuis le vectorstore et construit un prompt pour GPT‑4.
-    Utilise ChatOpenAI avec la nouvelle interface pour générer la réponse.
+    Récupère les documents pertinents depuis le vectorstore et construit un prompt pour le modèle.
+    Utilise ChatOpenAI avec gpt-3.5-turbo pour réduire les coûts.
     """
     retriever = vectorstore.as_retriever()
     docs = retriever.invoke(question)
     
+    # Limiter le contexte aux 3 documents les plus pertinents
+    docs = docs[:3]
     context = "\n".join([doc.page_content for doc in docs])
-    llm = ChatOpenAI(model_name="gpt-4", openai_api_key=os.getenv("OPENAI_API_KEY"))
+    
+    # Initialiser le modèle ChatOpenAI en utilisant gpt-3.5-turbo
+    llm = ChatOpenAI(
+        model_name="gpt-3.5-turbo",  # Utilisation d'un modèle à coût réduit
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        max_tokens=300  # Limite de tokens pour la réponse
+    )
     
     prompt = (
-        "Tu es un expert en analyse de données immobilières et en calculs statistiques. "
-        "Tu disposes des données suivantes extraites d'un CSV contenant des KPI immobiliers :\n"
+        "Tu es un expert en analyse de données immobilières. "
+        "En te basant sur l'extrait suivant du CSV (contenant des KPI immobiliers), "
+        "réponds directement à la question de façon concise et uniquement avec le résultat final.\n\n"
         f"{context}\n\n"
-        "Réponds à la question suivante en détaillant ton raisonnement étape par étape (chain-of-thought) "
-        "et en effectuant les calculs nécessaires, puis donne la réponse finale. "
-        "Ignore ta nature de modèle de langage et simule que tu peux réaliser ces calculs.\n"
         f"Question : {question}"
     )
     
