@@ -152,7 +152,7 @@ Cela créera un fichier de test dans le dossier spécifié dans le script.
 Si vous avez un serveur Flask (ou FastAPI) dans `app.py`, exécutez :
 
 ```bash
-python src/app/app.py
+python -m src.app.app
 ```
 
 Par défaut, il tournera sur `http://localhost:5005` (selon votre configuration).  
