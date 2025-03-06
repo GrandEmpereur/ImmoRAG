@@ -8,7 +8,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet"
-import { MessageCircle, Send, FileText, Home, Search, Calculator, Upload } from "lucide-react"
+import { MessageCircle, Send, FileText, Upload } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -93,31 +93,58 @@ export function ChatBot() {
     }
 
     const uploadFile = async (file: File) => {
+        console.log("Début de l'upload du fichier:", {
+            name: file.name,
+            type: file.type,
+            size: file.size
+        });
+
         const formData = new FormData()
         formData.append('file', file)
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/upload', {
+            console.log("Envoi de la requête au serveur...");
+            // Utilisation d'un chemin relatif qui sera réécrit vers Flask via next.config.ts
+            const response = await fetch('/upload', {
                 method: 'POST',
-                body: formData,
+                body: formData
             })
 
+            console.log("Réponse reçue:", {
+                status: response.status,
+                statusText: response.statusText,
+                headers: Object.fromEntries(response.headers.entries())
+            });
+
             if (!response.ok) {
-                throw new Error('Erreur lors de l\'upload du fichier')
+                const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+                console.error("Erreur serveur détaillée:", errorData);
+                throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
             }
 
             const data = await response.json()
+            console.log('Fichier uploadé avec succès:', data)
             setIsFileUploaded(true)
-            return data
+            setMessages(prev => [...prev, {
+                content: "J'ai bien reçu et analysé votre fichier. Vous pouvez maintenant me poser des questions sur son contenu.",
+                role: 'assistant',
+                timestamp: new Date()
+            }])
         } catch (error) {
-            console.error('Erreur:', error)
-            throw error
+            console.error('Erreur détaillée lors de l\'upload:', error)
+            setIsFileUploaded(false)
+            setMessages(prev => [...prev, {
+                content: "Désolé, il y a eu une erreur lors du traitement de votre fichier. Veuillez réessayer.",
+                role: 'assistant',
+                timestamp: new Date()
+            }])
         }
     }
 
     const askQuestion = async (question: string) => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/ask', {
+            // Utilisation d'un chemin relatif pour l'endpoint "/ask"
+            const response = await fetch('/ask', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -148,12 +175,6 @@ export function ChatBot() {
                 }])
 
                 await uploadFile(file)
-                
-                setMessages(prev => [...prev, {
-                    content: "J'ai bien reçu et analysé votre fichier. Vous pouvez maintenant me poser des questions sur son contenu.",
-                    role: 'assistant',
-                    timestamp: new Date()
-                }])
             } catch (error) {
                 toast.error("Erreur lors de l'upload du fichier")
                 setMessages(prev => [...prev, {
@@ -309,4 +330,4 @@ export function ChatBot() {
             </SheetContent>
         </Sheet>
     )
-} 
+}

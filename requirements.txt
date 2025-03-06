@@ -10,3 +10,5 @@ langchain-openai
 langchain-community
 faker
 pypdf
+fpdf
+jq
